@@ -76,7 +76,7 @@ if not df_total.empty:
         p_under_2 = poisson.cdf(2, mu_total) 
         prob_over_25 = (1 - p_under_2) * 100
 
-        # Al menos 1 gol (Probabilidad individual)
+        # Al menos 1 gol
         prob_1_loc = (1 - poisson.pmf(0, m_l)) * 100
         prob_1_vis = (1 - poisson.pmf(0, m_v)) * 100
         
@@ -108,20 +108,18 @@ if not df_total.empty:
 
         with c3:
             st.subheader("⚽ Over 2.5")
-            # CAMBIO: Umbral al 90%
             color_o = COLOR_VERDE if prob_over_25 > 90 else COLOR_NORMAL
             st.markdown(f"<p style='{color_o}'>{prob_over_25:.1f}%</p>", unsafe_allow_html=True)
 
         with c4:
             st.subheader("🥅 Ambos Marcan")
-            # CAMBIO: Umbral al 90%
             color_a = COLOR_VERDE if prob_ambos > 90 else COLOR_NORMAL
             st.markdown(f"<p style='{color_a}'>{prob_ambos:.1f}%</p>", unsafe_allow_html=True)
 
-        # NUEVA SECCIÓN: Gol individual
+        # SECCIÓN: Gol individual y FIABILIDAD
         st.divider()
         st.subheader("🎯 Probabilidad de anotar al menos 1 gol")
-        g1, g2 = st.columns(2)
+        g1, g2, g3 = st.columns([2, 2, 1]) # Añadimos espacio para la fiabilidad
         with g1:
             col_g_l = COLOR_VERDE if prob_1_loc > 90 else COLOR_NORMAL
             st.write(f"**{loc} (Local):**")
@@ -130,6 +128,14 @@ if not df_total.empty:
             col_g_v = COLOR_VERDE if prob_1_vis > 90 else COLOR_NORMAL
             st.write(f"**{vis} (Visitante):**")
             st.markdown(f"<p style='{col_g_v}'>{prob_1_vis:.1f}%</p>", unsafe_allow_html=True)
+        with g3:
+            # --- CÁLCULO DE FIABILIDAD ---
+            muestras = len(d_l) + len(d_v)
+            if muestras > 35: fiab, col_f = "ALTA", "#2ecc71"
+            elif muestras > 20: fiab, col_f = "MEDIA", "#f1c40f"
+            else: fiab, col_f = "BAJA", "#e74c3c"
+            st.write("**Fiabilidad:**")
+            st.markdown(f"<p style='color:{col_f}; font-weight:bold; font-size:20px;'>{fiab}</p>", unsafe_allow_html=True)
 
         # Expectativas
         st.divider()
